@@ -14,6 +14,9 @@ int main(int argc, char *argv[])
 
     // Set from args
     for (int i = 0; i < argc; i++) {
+        if (!strcmp(argv[i], "--threes")) {
+            settings.setValue("label", "Threes");
+        }
         if (!strcmp(argv[i], "--help")) {
             printf("%s [options]\n", "2048-qt");
             printf("\n");
@@ -21,6 +24,7 @@ int main(int argc, char *argv[])
             printf("\n");
             printf("Options:\n");
             printf("  --help   Print this help\n");
+            printf("  --threes Play Threes\n");
             exit(0);
         }
     }

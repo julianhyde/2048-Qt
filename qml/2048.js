@@ -16,6 +16,10 @@ var labelFunc = {
     function(n) {
         return Math.pow(2, n).toString();
     },
+    "Threes":
+    function(n) {
+        return (n < 3 ? n : 3 * Math.pow(2, n - 3)).toString();
+    },
     "PRC":
     function(n) {
         var arr = ["商", "周", "秦", "汉", "唐", "宋", "元", "明", "清", "民国", "天朝", "天庭"];

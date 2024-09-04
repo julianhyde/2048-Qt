@@ -98,6 +98,11 @@ Run the binary:
 $ ./2048-qt
 ```
 
+Run the binary in Threes mode:
+```
+$ ./2048-qt --threes
+```
+
 Get help:
 ```
 $ ./2048-qt --help
