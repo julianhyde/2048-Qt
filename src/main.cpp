@@ -14,6 +14,9 @@ int main(int argc, char *argv[])
 
     // Set from args
     for (int i = 0; i < argc; i++) {
+        if (!strcmp(argv[i], "--seed")) {
+            settings.setValue("seed", 12345);
+        }
         if (!strcmp(argv[i], "--threes")) {
             settings.setValue("label", "Threes");
         }
@@ -24,6 +27,7 @@ int main(int argc, char *argv[])
             printf("\n");
             printf("Options:\n");
             printf("  --help   Print this help\n");
+            printf("  --seed   Set seed for random-number generator\n");
             printf("  --threes Play Threes\n");
             exit(0);
         }

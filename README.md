@@ -83,6 +83,12 @@ On [Ubuntu](https://askubuntu.com/questions/1404263/how-do-you-install-qt-on-ubu
 $ sudo apt install qtcreator qtbase5-dev qt5-qmake cmake g++ qml-module-qtquick-dialogs qml-module-qtquick-controls qml-module-qtquick-window2 libqt5quickcontrols2-5 qtdeclarative5-dev
 ```
 
+If you've modified the JavaScript code, test it:
+```
+$ sudo apt install nodejs
+$ node qml/test.js
+```
+
 Generate `Makefile`:
 ```
 $ qmake 2048-qt.pro

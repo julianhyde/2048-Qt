@@ -9,6 +9,10 @@ var targetLevel = 11;
 var checkTargetFlag = true;
 var tileComponent = Qt.createComponent("Tile.qml");
 
+// Pseudo-random number generator.
+// random(base) returns an integer between 0 and base - 1, inclusive.
+var random;
+
 var label = settings.value("label", "2048");
 var labelOptions = ["2048", "Degree", "Military Rank", "PRC"];
 var labelFunc = {
@@ -47,12 +51,36 @@ var labelFunc = {
 }
 
 
+// Pseudo-random number generator --------------------------------
+// Based on
+// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+function splitmix32(a) {
+ return function(base) {
+   a |= 0;
+   a = a + 0x9e3779b9 | 0;
+   let t = a ^ a >>> 16;
+   t = Math.imul(t, 0x21f0aaad);
+   t = t ^ t >>> 15;
+   t = Math.imul(t, 0x735a2d97);
+   return ((t = t ^ t >>> 15) >>> 0) % base;
+  }
+}
+
 function startupFunction() {
     // Initialize variables
     score = 0;
     checkTargetFlag = true;
     var i;
     var j;
+
+    var seed = settings.value("seed", 0);
+    if (seed == 0) {
+        random = function(base) {
+            return Math.floor(Math.random() * base);
+        };
+    } else {
+        random = splitmix32(seed >>> 0);
+    }
 
     cellValues = new Array(gridSize);
     for (i = 0; i < gridSize; i++) {
@@ -278,8 +306,8 @@ function createNewTileItems(isStartup) {
 
     // Popup a new number
     for (i = 0; i < nTiles; i++) {
-        var oneOrTwo = Math.random() < 0.9 ? 1: 2;
-        var randomCellId = availableCells[Math.floor(Math.random() * availableCells.length)];
+        var oneOrTwo = random(10) < 9 ? 1 : 2;
+        var randomCellId = availableCells[random(availableCells.length)];
 
         sub = ind2sub(randomCellId);
         cellValues[sub[0]][sub[1]] = oneOrTwo;
@@ -474,4 +502,51 @@ function cleanUpAndQuit() {
     if (label !== settings.value("label", "2048"))
         settings.setValue("label", label);
     Qt.quit();
+}
+
+// Returns an object that generates a sequence of pieces.
+//
+// `random` should be a function such that `random(3)` returns 0, 1 or
+// 2 with equal probability.
+//
+// With probability 1/21, returns 4 (indicating a high-value piece);
+// otherwise returns 1, 2 or 3 with equal probability.  The 1, 2, 3
+// values are held in a buffer of length 12, and returned at random
+// until the buffer is empty, at which point it is re-filled.
+//
+function pieceGenerator(rand) {
+    return {
+        // Buffer containing 4 ones, 4 twos, 4 threes.
+        buf: [1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3],
+        // Current pointer in the buffer. Advances from 0 to 11, then
+        // back to 0.  All elements below i have been emitted already.
+        // (When we reset to 0, it's not necessary to restore the
+        // buffer: the elements are all there, and we don't care in
+        // which order.)
+        i: 0,
+        next: function() {
+            if (rand(21) == 0) {
+                return 4; // high piece
+            }
+            slot = this.i + rand(12 - this.i); // random slot, [i, 12)
+            piece = this.buf[slot];
+            if (this.i != slot) {
+                this.buf[slot] = this.buf[this.i];
+                this.buf[this.i] = piece;
+            }
+            this.i = (this.i + 1) % 12;
+            return piece;
+        }
+    };
+}
+
+// Export some functions so that they can be tested; see test.js.
+module.exports = {
+    labelFunc,
+    label,
+    pieceGenerator,
+    setRandom: function(r) {
+        random = r;
+    },
+    splitmix32
 }
