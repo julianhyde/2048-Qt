@@ -98,6 +98,11 @@ Run the binary:
 $ ./2048-qt
 ```
 
+Get help:
+```
+$ ./2048-qt --help
+```
+
 Clean:
 ```
 make clean && rm -f 2048-qt Makefile .qmake.stash

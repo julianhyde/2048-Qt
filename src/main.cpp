@@ -12,6 +12,19 @@ int main(int argc, char *argv[])
     Settings settings(0, "2048-qt", "2048-Qt");
     settings.setVersion(QString(APP_VERSION));
 
+    // Set from args
+    for (int i = 0; i < argc; i++) {
+        if (!strcmp(argv[i], "--help")) {
+            printf("%s [options]\n", "2048-qt");
+            printf("\n");
+            printf("Play 2048 or Threes.\n");
+            printf("\n");
+            printf("Options:\n");
+            printf("  --help   Print this help\n");
+            exit(0);
+        }
+    }
+
     // Localization
     QString locale;
     if (settings.contains("language")) {
